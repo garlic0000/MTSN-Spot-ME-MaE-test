@@ -5,8 +5,8 @@ from prepare_data import *
 from train_model import *
 from load_gt import *
 
-def main(config):
 
+def main(config):
     dataset_name = config.dataset_name
     print('\n ------', dataset_name, '------')
 
@@ -18,7 +18,8 @@ def main(config):
     print('\n ------ Loading Excel ------')
     codeFinal = load_excel(dataset_name)
     print('\n ------ Loading Ground Truth From Excel ------')
-    final_subjects, final_videos, final_samples, final_exp = load_label(dataset_name, final_subjects, final_videos, codeFinal) 
+    final_subjects, final_videos, final_samples, final_exp = load_label(dataset_name, final_subjects, final_videos,
+                                                                        codeFinal)
 
     # Spotting Pseudo-labeling
     print('\n ------ Pseudo-Labeling ------')
@@ -36,12 +37,13 @@ def main(config):
 
     print('\n ------ Completed ------')
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # input parameters
-    parser.add_argument('--dataset_name', type=str, default='CASME_sq') # CASME_sq or SAMMLV only
-    
+    parser.add_argument('--dataset_name', type=str, default='CASME_sq')  # CASME_sq or SAMMLV only
+
     config = parser.parse_args()
 
     main(config)
