@@ -8,14 +8,21 @@ from network import *
 from dataloader import *
 from spot_interval import *
 
+cas_pred_csv_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/cas_pred.csv"
+samm_pred_csv_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/samm_pred.csv"
+cas_weights_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/megc2022-pretrained-weights/cas_weights.pkl"
+samm_weights_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/megc2022-pretrained-weights/samm_weights.pkl"
+
 
 def test(dataset_name, final_subjects, final_videos, dataset, X_all, X1_all, batch_size, micro_threshold,
          macro_threshold, dif_threshold):
     # Write final result to csv file
     if dataset_name == 'CAS_Test_cropped':
-        file_out = 'cas_pred.csv'
+        # file_out = 'cas_pred.csv'
+        file_out = cas_pred_csv_path
     elif dataset_name == 'SAMM_Test_cropped':
-        file_out = 'samm_pred.csv'
+        # file_out = 'samm_pred.csv'
+        file_out = samm_pred_csv_path
 
     f = open(file_out, mode='w', newline='')
     writer = csv.writer(f, delimiter=',')
@@ -37,10 +44,14 @@ def test(dataset_name, final_subjects, final_videos, dataset, X_all, X1_all, bat
         device = torch.device('cpu')
 
     model = MTSN().cuda()
+    # if dataset_name == 'CAS_Test_cropped':
+    #     model.load_state_dict(torch.load("megc2022-pretrained-weights/cas_weights.pkl"))
+    # elif dataset_name == 'SAMM_Test_cropped':
+    #     model.load_state_dict(torch.load("megc2022-pretrained-weights/samm_weights.pkl"))
     if dataset_name == 'CAS_Test_cropped':
-        model.load_state_dict(torch.load("megc2022-pretrained-weights/cas_weights.pkl"))
+        model.load_state_dict(torch.load(cas_weights_path))
     elif dataset_name == 'SAMM_Test_cropped':
-        model.load_state_dict(torch.load("megc2022-pretrained-weights/samm_weights.pkl"))
+        model.load_state_dict(torch.load(samm_weights_path))
 
     for subject_index in range(len(X_all)):
         print('Subject:', final_subjects[subject_count])

@@ -1,16 +1,28 @@
 import pickle
 import numpy as np
 
+megc2022_processed_data_root_path = "/kaggle/input/megc2022/megc2022-processed-data/"
+megc2021_processed_data_root_path = "/kaggle/input/megc2021/megc2021-processed-data/"
+
+
 # Load data from pre-computed optical flow
 def load_data(dataset_name):
-    final_videos = pickle.load( open( "megc2022-processed-data/" + dataset_name + "_subjectsVideos.pkl", "rb" ) )
-    final_subjects = pickle.load( open( "megc2022-processed-data/" + dataset_name + "_subjects.pkl", "rb" ) )
+    # final_videos = pickle.load(open("megc2022-processed-data/" + dataset_name + "_subjectsVideos.pkl", "rb"))
+    # final_subjects = pickle.load(open("megc2022-processed-data/" + dataset_name + "_subjects.pkl", "rb"))
+    # if dataset_name == 'CAS_Test_cropped':
+    #     dataset = pickle.load(open("megc2022-processed-data/" + dataset_name + "_dataset_k6.pkl", "rb"))
+    # elif dataset_name == 'SAMM_Test_cropped':
+    #     dataset = pickle.load(open("megc2022-processed-data/" + dataset_name + "_dataset_k37.pkl", "rb"))
+    # dataset1 = pickle.load(open("megc2022-processed-data/" + dataset_name + "_dataset_k1.pkl", "rb"))
+    final_videos = pickle.load(open(megc2022_processed_data_root_path + dataset_name + "_subjectsVideos.pkl", "rb"))
+    final_subjects = pickle.load(open(megc2022_processed_data_root_path + dataset_name + "_subjects.pkl", "rb"))
     if dataset_name == 'CAS_Test_cropped':
-        dataset = pickle.load( open( "megc2022-processed-data/" + dataset_name + "_dataset_k6.pkl", "rb" ) )
+        dataset = pickle.load(open(megc2022_processed_data_root_path + dataset_name + "_dataset_k6.pkl", "rb"))
     elif dataset_name == 'SAMM_Test_cropped':
-        dataset = pickle.load( open( "megc2022-processed-data/" + dataset_name + "_dataset_k37.pkl", "rb" ) )
-    dataset1 = pickle.load( open( "megc2022-processed-data/" + dataset_name + "_dataset_k1.pkl", "rb" ) )
+        dataset = pickle.load(open(megc2022_processed_data_root_path + dataset_name + "_dataset_k37.pkl", "rb"))
+    dataset1 = pickle.load(open(megc2022_processed_data_root_path + dataset_name + "_dataset_k1.pkl", "rb"))
     return final_subjects, final_videos, dataset, dataset1
+
 
 def prepare_dataset(dataset, dataset1):
     X_all = []
@@ -21,35 +33,43 @@ def prepare_dataset(dataset, dataset1):
         X1_all.append(video[:len(dataset[video_index])])
     return X_all, X1_all
 
+
 # Load training data from pre-computed optical flow
 def load_train_data(dataset_name):
-    final_videos = pickle.load( open( "megc2021-processed-data/" + dataset_name + "_subjectsVideos.pkl", "rb" ) )
-    final_subjects = pickle.load( open( "megc2021-processed-data/" + dataset_name + "_subjects.pkl", "rb" ) )
+    # final_videos = pickle.load(open("megc2021-processed-data/" + dataset_name + "_subjectsVideos.pkl", "rb"))
+    # final_subjects = pickle.load(open("megc2021-processed-data/" + dataset_name + "_subjects.pkl", "rb"))
+    # if dataset_name == 'CASME_sq':
+    #     dataset = pickle.load(open("megc2021-processed-data/" + dataset_name + "_dataset_k6.pkl", "rb"))
+    # elif dataset_name == 'SAMMLV':
+    #     dataset = pickle.load(open("megc2021-processed-data/" + dataset_name + "_dataset_k37.pkl", "rb"))
+    # dataset1 = pickle.load(open("megc2021-processed-data/" + dataset_name + "_dataset_k1.pkl", "rb"))
+    final_videos = pickle.load(open(megc2021_processed_data_root_path + dataset_name + "_subjectsVideos.pkl", "rb"))
+    final_subjects = pickle.load(open(megc2021_processed_data_root_path + dataset_name + "_subjects.pkl", "rb"))
     if dataset_name == 'CASME_sq':
-        dataset = pickle.load( open( "megc2021-processed-data/" + dataset_name + "_dataset_k6.pkl", "rb" ) )
+        dataset = pickle.load(open(megc2021_processed_data_root_path + dataset_name + "_dataset_k6.pkl", "rb"))
     elif dataset_name == 'SAMMLV':
-        dataset = pickle.load( open( "megc2021-processed-data/" + dataset_name + "_dataset_k37.pkl", "rb" ) )
-    dataset1 = pickle.load( open( "megc2021-processed-data/" + dataset_name + "_dataset_k1.pkl", "rb" ) )
+        dataset = pickle.load(open(megc2021_processed_data_root_path + dataset_name + "_dataset_k37.pkl", "rb"))
+    dataset1 = pickle.load(open(megc2021_processed_data_root_path + dataset_name + "_dataset_k1.pkl", "rb"))
     return final_subjects, final_videos, dataset, dataset1
 
-    
+
 def pseudo_labeling(dataset, dataset1, final_samples):
     pseudo_y = []
     pseudo_y1 = []
-    video_count = 0 
+    video_count = 0
 
     for subject_index, subject in enumerate(final_samples):
         for video_index, video in enumerate(subject):
             samples_arr = []
-            pseudo_y_each = [0]*(len(dataset[video_count]))
-            pseudo_y1_each = [0]*(len(dataset[video_count]))
+            pseudo_y_each = [0] * (len(dataset[video_count]))
+            pseudo_y1_each = [0] * (len(dataset[video_count]))
 
             for sample_index, sample in enumerate(video):
-                if sample[0] > 1: # SAMMLV has few samples with onset 0 or 1 (with super long duration)
+                if sample[0] > 1:  # SAMMLV has few samples with onset 0 or 1 (with super long duration)
                     onset = sample[0]
                 else:
                     onset = sample[1]
-                offset = sample[2]+1
+                offset = sample[2] + 1
                 for frame_index, frame in enumerate(range(onset, offset)):
                     if frame < len(pseudo_y_each):
                         # Hard label
@@ -63,7 +83,7 @@ def pseudo_labeling(dataset, dataset1, final_samples):
                             pseudo_y1_each[frame] = score
             pseudo_y.append(pseudo_y_each)
             pseudo_y1.append(pseudo_y1_each)
-            video_count+=1
+            video_count += 1
 
     print('Total video:', len(pseudo_y))
 
@@ -83,6 +103,5 @@ def pseudo_labeling(dataset, dataset1, final_samples):
     X = [frame for video in X for frame in video]
     X1 = [frame for video in X1 for frame in video]
     print('\nTotal X:', len(X), 'Total X1:', len(X1), ', Total y:', len(Y), ', Total y:', len(Y1))
-    
+
     return X, X1, Y, Y1
-    

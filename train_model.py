@@ -11,6 +11,8 @@ from prepare_data import *
 from network import *
 from dataloader import *
 
+cas_weights_new_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/megc2022-pretrained-weights/cas_weights_new.pkl"
+samm_weights_new_path = "/kaggle/working/MTSN-Spot-ME-MaE-test/megc2022-pretrained-weights/samm_weights_new.pkl"
 
 def train(dataset_name, X, X1, Y, Y1, epochs, lr_classifier, batch_size, ratio):
     start = time.time()
@@ -90,11 +92,16 @@ def train(dataset_name, X, X1, Y, Y1, epochs, lr_classifier, batch_size, ratio):
         print('Epoch:', epoch, '| loss:', round(loss.item(), 4), '| hard loss:', round(loss1.item(), 4), '| soft_loss:',
               round(loss2.item(), 4))
 
+    # # Save models
+    # if dataset_name == 'CASME_sq':
+    #     torch.save(model.state_dict(), os.path.join("megc2022-pretrained-weights/cas_weights_new.pkl"))
+    # if dataset_name == 'SAMMLV':
+    #     torch.save(model.state_dict(), os.path.join("megc2022-pretrained-weights/samm_weights_new.pkl"))
     # Save models
     if dataset_name == 'CASME_sq':
-        torch.save(model.state_dict(), os.path.join("megc2022-pretrained-weights/cas_weights_new.pkl"))
+        torch.save(model.state_dict(), os.path.join(cas_weights_new_path))
     if dataset_name == 'SAMMLV':
-        torch.save(model.state_dict(), os.path.join("megc2022-pretrained-weights/samm_weights_new.pkl"))
+        torch.save(model.state_dict(), os.path.join(samm_weights_new_path))
 
     end = time.time()
     print('Total time taken for training & testing: ' + str(end - start) + 's')
